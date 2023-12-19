@@ -1,4 +1,4 @@
-package com.tzashinorpu.springsecuritydemo.config;
+package com.tzashinorpu.springsecuritydemo.custom;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -13,18 +13,18 @@ import java.util.Objects;
 
 public class MyAuthenticationProvider extends DaoAuthenticationProvider {
 
-	/*@Override
+	@Override
 	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
 		Object object = authentication.getDetails();
-		*//*System.out.printf(object.getClass().getName());
+//		System.out.printf(object.getClass().getName());
 		MyWebAuthenticationDetails details = (MyWebAuthenticationDetails) object;
 		if (!details.isPassed()) {
 			throw new AuthenticationServiceException("验证码错误");
-		}*//*
+		}
 		super.additionalAuthenticationChecks(userDetails, authentication);
-	}*/
+	}
 
-	@Override
+/*	@Override
 	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
 		HttpServletRequest req = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
 		String code = (String) req.getSession().getAttribute("verify_code");
@@ -34,5 +34,5 @@ public class MyAuthenticationProvider extends DaoAuthenticationProvider {
 			throw new AuthenticationServiceException("验证码错误");
 		}
 		super.additionalAuthenticationChecks(userDetails, authentication);
-	}
+	}*/
 }

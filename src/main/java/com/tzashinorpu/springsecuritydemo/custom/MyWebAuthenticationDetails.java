@@ -1,4 +1,4 @@
-package com.tzashinorpu.springsecuritydemo.config;
+package com.tzashinorpu.springsecuritydemo.custom;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -11,7 +11,7 @@ public class MyWebAuthenticationDetails extends WebAuthenticationDetails {
 		super(req);
 		String code = req.getParameter("code");
 		String verify_code = (String) req.getSession().getAttribute("verify_code");
-		if (code != null && code.equals(verify_code)) {
+		if (code != null && code.equalsIgnoreCase(verify_code)) {
 			isPassed = true;
 		}
 	}

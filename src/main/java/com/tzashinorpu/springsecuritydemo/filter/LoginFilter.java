@@ -21,6 +21,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			throw new AuthenticationServiceException(
 					"Authentication method not supported: " + request.getMethod());
 		}
+
 		String verify_code = (String) request.getSession().getAttribute("verify_code");
 		String contentType = request.getContentType();
 		if (contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE) || contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_UTF8_VALUE)) {
