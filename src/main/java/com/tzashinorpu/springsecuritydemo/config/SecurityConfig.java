@@ -90,8 +90,8 @@ public class SecurityConfig {
     VerifyCodeFilter verifyCodeFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http/*,
-                                                   LoginFilter loginFilter*/
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   LoginFilter loginFilter
     ) throws Exception {
 //		http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -106,13 +106,13 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated()
                 )
-                .formLogin(
+                /*.formLogin(
                         formLoginCustomizer-> formLoginCustomizer
                                         .loginPage("/login.html")
                                         .loginProcessingUrl("/doLogin")
                                         .usernameParameter("name")
                                         .passwordParameter("passwd")
-                                .authenticationDetailsSource(myWebAuthenticationDetailsSource)
+                                        .authenticationDetailsSource(myWebAuthenticationDetailsSource)
                                         .successHandler((req, resp, authentication) -> {
                                             Object principal = authentication.getPrincipal();
                                             resp.setContentType("application/json;charset=utf-8");
@@ -129,7 +129,7 @@ public class SecurityConfig {
                                             out.close();
                                         })
                                         .permitAll()
-                )
+                )*/
                 .logout(logout->logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler((req, resp, authentication) -> {
@@ -151,7 +151,7 @@ public class SecurityConfig {
                             out.close();
                 }));
         // @formatter:off
-//        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
         // @formatter:on
         return http.build();
     }
@@ -174,7 +174,7 @@ public class SecurityConfig {
     @Bean
     LoginFilter loginFilter(AuthenticationManager authenticationManager) throws Exception {
         LoginFilter loginFilter = new LoginFilter();
-        loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
+
 
         loginFilter.setAuthenticationSuccessHandler(new AuthenticationSuccessHandler() {
             @Override
@@ -213,7 +213,10 @@ public class SecurityConfig {
             }
         });
         loginFilter.setAuthenticationManager(authenticationManager);
+        loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
         loginFilter.setFilterProcessesUrl("/doLogin");
+        loginFilter.setUsernameParameter("name");
+        loginFilter.setPasswordParameter("passwd");
         return loginFilter;
     }
 }
