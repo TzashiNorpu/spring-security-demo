@@ -3,69 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <title>Norpu</title>
-
-    <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 <body>
-
-
-<div class="materialContainer">
-    <div class="box">
-        <div class="title">Norpu-登录</div>
-        <form action="/doLogin" method="post">
-            <div class="input">
-                <label for="name">用户名</label>
-                <input type="text" name="name" id="name">
-                <span class="spin"></span>
-            </div>
-            <div class="input">
-                <label for="pass">密码</label>
-                <input type="password" name="passwd" id="pass">
-                <span class="spin"></span>
-            </div>
-            <div class="button login">
-                <button type="submit">
-                    <span>登录</span>
-                    <i class="fa fa-check"></i>
-                </button>
-            </div>
-        </form>
-        <a href="javascript:" class="pass-forgot">忘记密码？</a>
-    </div>
-
-    <div class="overbox">
-        <div class="material-button alt-2">
-            <span class="shape"></span>
-        </div>
-        <div class="title">Norpu-注册</div>
-        <div class="input">
-            <label for="regname">用户名</label>
-            <input type="text" name="regname" id="regname">
-            <span class="spin"></span>
-        </div>
-        <div class="input">
-            <label for="regpass">密码</label>
-            <input type="password" name="regpass" id="regpass">
-            <span class="spin"></span>
-        </div>
-        <div class="input">
-            <label for="reregpass">确认密码</label>
-            <input type="password" name="reregpass" id="reregpass">
-            <span class="spin"></span>
-        </div>
-        <div class="button">
-            <button>
-                <span>注册</span>
-            </button>
-        </div>
-    </div>
-
+<div class="container">
+<div class="center">
+    <input type="text" id="username">
+    <br>
+    <input type="password" id="password">
+    <br>
+    <input type="text" id="verify-code">
+    <br>
+    <input
+            type="checkbox"
+            id="remember"
+            name="remember"
+            value="on" />
+    <label for="remember">记住我</label>
+    <img src="/verify-code">
+    <br>
+    <input type="button" value="登录" id="loginBtn">
+    <br>
 </div>
-
-<script src="js/jquery.min.js"></script>
-<script src="js/index.js"></script>
-
+</div>
+<script>
+    $("#loginBtn").on('click',function(){
+    let _csrf = $.cookie('XSRF-TOKEN');
+        $.ajax({
+            url: "/doLogin",
+            data: {
+                name:$("#username").val(),
+                passwd:$("#password").val(),
+                code:$("#verify-code").val(),
+                "remember-me":$("#remember").val(),
+                _csrf:_csrf
+               },
+            type: "POST",
+            dataType: "application/json;charset=UTF-8",
+            success: function(data) {
+                console.log(data);
+            }
+        });
+    });
+</script>
 </body>
 </html>
+
+<!--
+
+
+<body>
+<div class="container">
+    <form action="/doLogin" method="post" class="center">
+        <input type="text" name="name" id="name">
+        <br>
+        <input type="password" name="passwd" id="passwd">
+        <br>
+        <input type="text" name="code" id="code">
+        <br>
+        <input
+                type="checkbox"
+                id="remember-me"
+                name="remember-me"
+                value="on" />
+        <label for="remember-me">记住我</label>
+        <input type="submit" value="登录" >
+        <br>
+    </form>
+    <img src="/verify-code">
+    <br>
+</div>
+</body>
+</html>-->
