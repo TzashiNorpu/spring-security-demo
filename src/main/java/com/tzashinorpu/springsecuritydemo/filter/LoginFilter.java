@@ -1,13 +1,16 @@
 package com.tzashinorpu.springsecuritydemo.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tzashinorpu.springsecuritydemo.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -15,6 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
+
+	@Autowired
+	SessionRegistry sessionRegistry;
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 		if (!request.getMethod().equals("POST")) {
@@ -47,6 +53,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
 					username, password);
 			setDetails(request, authRequest);
+			User user = new User();
+			user.setUsername(username);
+			sessionRegistry.registerNewSession(request.getSession(true).getId(), user);
 			return this.getAuthenticationManager().authenticate(authRequest);
 		} else {
 			checkCode(response, request.getParameter("code"), verify_code);

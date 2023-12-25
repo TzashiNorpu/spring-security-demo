@@ -6,6 +6,7 @@ import com.tzashinorpu.springsecuritydemo.custom.MyWebAuthenticationDetailsSourc
 import com.tzashinorpu.springsecuritydemo.filter.LoginFilter;
 import com.tzashinorpu.springsecuritydemo.filter.VerifyCodeFilter;
 import com.tzashinorpu.springsecuritydemo.model.ResponseBean;
+import com.tzashinorpu.springsecuritydemo.repo.JdbcTokenRepositoryImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,10 +16,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +30,10 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.session.ConcurrentSessionFilter;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -49,14 +55,14 @@ public class SecurityConfig {
         return hierarchy;
     }
 
-	/*@Bean
-	public AuthenticationManager authenticationManager(UserDetailsService userService, PasswordEncoder passwordEncoder) {
-		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-		authenticationProvider.setUserDetailsService(userService);
-		authenticationProvider.setPasswordEncoder(passwordEncoder);
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService userService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
 
-		return new ProviderManager(authenticationProvider);
-	}*/
+        return new ProviderManager(authenticationProvider);
+    }
 
     /*@Bean
     protected UserDetailsService userDetailsService() {
@@ -84,14 +90,26 @@ public class SecurityConfig {
                 .build();
         return new InMemoryUserDetailsManager(admin,user);
     }*/
-    @Autowired
-    MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;
+/*    @Autowired
+    MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;*/
     @Autowired
     VerifyCodeFilter verifyCodeFilter;
 
+    @Autowired
+    DataSource dataSource;
+
+    @Bean
+    JdbcTokenRepositoryImpl jdbcTokenRepository() {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   LoginFilter loginFilter
+                                                   LoginFilter loginFilter,
+                                                   JdbcTokenRepositoryImpl jdbcTokenRepository,
+                                                   SessionRegistryImpl sessionRegistry
     ) throws Exception {
 //		http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -112,7 +130,7 @@ public class SecurityConfig {
                                         .loginProcessingUrl("/doLogin")
                                         .usernameParameter("name")
                                         .passwordParameter("passwd")
-                                        .authenticationDetailsSource(myWebAuthenticationDetailsSource)
+//                                        .authenticationDetailsSource(myWebAuthenticationDetailsSource)
                                         .successHandler((req, resp, authentication) -> {
                                             Object principal = authentication.getPrincipal();
                                             resp.setContentType("application/json;charset=utf-8");
@@ -141,6 +159,7 @@ public class SecurityConfig {
                         })
                         .permitAll()
                 )
+                .rememberMe(remember -> remember.key("xxx").rememberMeCookieName("rem").tokenRepository(jdbcTokenRepository))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(handler->handler
                         .authenticationEntryPoint((req, resp, authException) -> {
@@ -152,27 +171,41 @@ public class SecurityConfig {
                 }));
         // @formatter:off
         http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry, event -> {
+            HttpServletResponse resp = event.getResponse();
+            resp.setContentType("application/json;charset=utf-8");
+            resp.setStatus(401);
+            PrintWriter out = resp.getWriter();
+            out.write(new ObjectMapper().writeValueAsString(ResponseBean.error("您已在另一台设备登录，本次登录已下线!")));
+            out.flush();
+            out.close();
+        }), ConcurrentSessionFilter.class);
         // @formatter:on
         return http.build();
     }
 
+    /*    @Bean
+        MyAuthenticationProvider myAuthenticationProvider(UserDetailsService userService) {
+            MyAuthenticationProvider myAuthenticationProvider = new MyAuthenticationProvider();
+            myAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+            myAuthenticationProvider.setUserDetailsService(userService);
+            return myAuthenticationProvider;
+        }
+
+        @Bean
+        protected AuthenticationManager authenticationManager(MyAuthenticationProvider myAuthenticationProvider) throws Exception {
+            ProviderManager providerManager = new ProviderManager(Collections.singletonList(myAuthenticationProvider));
+            return providerManager;
+        }*/
+
     @Bean
-    MyAuthenticationProvider myAuthenticationProvider(UserDetailsService userService) {
-        MyAuthenticationProvider myAuthenticationProvider = new MyAuthenticationProvider();
-        myAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        myAuthenticationProvider.setUserDetailsService(userService);
-        return myAuthenticationProvider;
+    SessionRegistryImpl sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 
-    @Bean
-    protected AuthenticationManager authenticationManager(MyAuthenticationProvider myAuthenticationProvider) throws Exception {
-        ProviderManager providerManager = new ProviderManager(Collections.singletonList(myAuthenticationProvider));
-        return providerManager;
-    }
-
 
     @Bean
-    LoginFilter loginFilter(AuthenticationManager authenticationManager) throws Exception {
+    LoginFilter loginFilter(AuthenticationManager authenticationManager, SessionRegistryImpl sessionRegistry) throws Exception {
         LoginFilter loginFilter = new LoginFilter();
 
 
@@ -213,7 +246,10 @@ public class SecurityConfig {
             }
         });
         loginFilter.setAuthenticationManager(authenticationManager);
-        loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
+        ConcurrentSessionControlAuthenticationStrategy sessionControlAuthenticationStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
+        sessionControlAuthenticationStrategy.setMaximumSessions(1);
+        loginFilter.setSessionAuthenticationStrategy(sessionControlAuthenticationStrategy);
+//        loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
         loginFilter.setFilterProcessesUrl("/doLogin");
         loginFilter.setUsernameParameter("name");
         loginFilter.setPasswordParameter("passwd");
