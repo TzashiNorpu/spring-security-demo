@@ -1,5 +1,6 @@
 package com.tzashinorpu.springsecuritydemo.entity;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import static org.apache.catalina.realm.UserDatabaseRealm.getRoles;
 
 @Entity(name = "t_user")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
