@@ -1,4 +1,4 @@
-package com.tzashinorpu.springsecuritydemo.config;
+package com.tzashinorpu.springsecuritydemo.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,10 +7,10 @@ import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession;
 
 @Configuration(proxyBeanMethods = false)
-@EnableRedisHttpSession(redisNamespace="spring.tzashinorpu")
+@EnableRedisIndexedHttpSession(redisNamespace="spring.tzashinorpu")
 public class RedisConfig {
 	@Value("${server.servlet.session.timeout}")
 	private int time_out;

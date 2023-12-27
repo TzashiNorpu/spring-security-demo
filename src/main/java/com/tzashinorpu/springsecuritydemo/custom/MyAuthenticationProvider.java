@@ -1,3 +1,4 @@
+/*
 package com.tzashinorpu.springsecuritydemo.custom;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class MyAuthenticationProvider extends DaoAuthenticationProvider {
 		super.additionalAuthenticationChecks(userDetails, authentication);
 	}
 
+*/
 /*	@Override
 	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
 		HttpServletRequest req = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
@@ -34,5 +36,7 @@ public class MyAuthenticationProvider extends DaoAuthenticationProvider {
 			throw new AuthenticationServiceException("验证码错误");
 		}
 		super.additionalAuthenticationChecks(userDetails, authentication);
-	}*/
+	}*//*
+
 }
+*/

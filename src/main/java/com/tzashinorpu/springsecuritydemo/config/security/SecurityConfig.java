@@ -1,7 +1,7 @@
-package com.tzashinorpu.springsecuritydemo.config;
+package com.tzashinorpu.springsecuritydemo.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tzashinorpu.springsecuritydemo.custom.MyWebAuthenticationDetailsSource;
+//import com.tzashinorpu.springsecuritydemo.custom.MyWebAuthenticationDetailsSource;
 import com.tzashinorpu.springsecuritydemo.filter.LoginFilter;
 import com.tzashinorpu.springsecuritydemo.filter.VerifyCodeFilter;
 import com.tzashinorpu.springsecuritydemo.model.ResponseBean;
@@ -124,14 +124,15 @@ public class SecurityConfig<S extends Session> {
 		return jdbcTokenRepository;
 	}
 
-	@Autowired
-	MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;
+	/*@Autowired
+	MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;*/
 	@Autowired
 	VerifyCodeFilter verifyCodeFilter;
-		@Bean
-		SessionRegistryImpl sessionRegistry() {
-			return new SessionRegistryImpl();
-		}
+
+	@Bean
+	SessionRegistryImpl sessionRegistry() {
+		return new SessionRegistryImpl();
+	}
 /*	@Autowired
 	FindByIndexNameSessionRepository<S> sessionRepository;
 	@Bean
@@ -164,7 +165,7 @@ public class SecurityConfig<S extends Session> {
                                         .loginProcessingUrl("/doLogin")
                                         .usernameParameter("name")
                                         .passwordParameter("passwd")
-                                        .authenticationDetailsSource(myWebAuthenticationDetailsSource)
+//                                        .authenticationDetailsSource(myWebAuthenticationDetailsSource)
                                         .successHandler((req, resp, authentication) -> {
                                             resp.setContentType("application/json;charset=utf-8");
                                             PrintWriter out = resp.getWriter();
@@ -220,7 +221,7 @@ public class SecurityConfig<S extends Session> {
 		return http.build();
 	}
 
-//	@Bean
+	//	@Bean
 	public SpringSessionRememberMeServices rememberMeServices() {
 		SpringSessionRememberMeServices rememberMeServices = new SpringSessionRememberMeServices();
 		// optionally customize
@@ -228,13 +229,13 @@ public class SecurityConfig<S extends Session> {
 		return rememberMeServices;
 	}
 
-//	@Bean
+	//	@Bean
 	HttpSessionEventPublisher httpSessionEventPublisher() {
 		return new HttpSessionEventPublisher();
 	}
 
 
-//			@Bean
+	//			@Bean
 	LoginFilter loginFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry) throws
 			Exception {
 		LoginFilter loginFilter = new LoginFilter();
@@ -284,7 +285,7 @@ public class SecurityConfig<S extends Session> {
 		ConcurrentSessionControlAuthenticationStrategy sessionControlAuthenticationStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
 		sessionControlAuthenticationStrategy.setMaximumSessions(1);
 		loginFilter.setSessionAuthenticationStrategy(sessionControlAuthenticationStrategy);
-		loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
+//		loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
 		loginFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 		loginFilter.setRememberMeServices(rememberMeServices());
 		loginFilter.setFilterProcessesUrl("/doLogin");

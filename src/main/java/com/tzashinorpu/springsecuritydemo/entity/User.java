@@ -1,7 +1,11 @@
 package com.tzashinorpu.springsecuritydemo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.*;
+import org.apache.ibatis.type.JdbcType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,31 +14,41 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.apache.catalina.realm.UserDatabaseRealm.getRoles;
 
-@Entity(name = "t_user")
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@TableName("t_user")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private String username;
     private String password;
+    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean accountNonExpired;
+    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean accountNonLocked;
+    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean credentialsNonExpired;
+    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean enabled;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<Role> roles;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+    List<SimpleGrantedAuthority> authorities;
+
+    private void setAuthorities(){
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         for (Role role : getRoles()) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
-        return authorities;
+        this.authorities = authorities;
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        this.setAuthorities();
+        return this.authorities;
     }
 
     public Long getId() {
@@ -118,5 +132,20 @@ public class User implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(username);
+    }
+
+    @Override
+    public String toString() {
+        String roles_flatten = roles.stream().map(Role::toString).collect(Collectors.joining(","));
+        return "User{" +
+            "id=" + id +
+            ", username='" + username + '\'' +
+            ", password='" + password + '\'' +
+            ", accountNonExpired=" + accountNonExpired +
+            ", accountNonLocked=" + accountNonLocked +
+            ", credentialsNonExpired=" + credentialsNonExpired +
+            ", enabled=" + enabled +
+            ", roles=" + roles +
+            '}';
     }
 }

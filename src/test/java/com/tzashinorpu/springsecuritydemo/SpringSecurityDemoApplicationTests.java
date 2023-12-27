@@ -1,11 +1,12 @@
 package com.tzashinorpu.springsecuritydemo;
 
-import com.tzashinorpu.springsecuritydemo.dao.UserDao;
 import com.tzashinorpu.springsecuritydemo.entity.Role;
 import com.tzashinorpu.springsecuritydemo.entity.User;
+import com.tzashinorpu.springsecuritydemo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @SpringBootTest
 class SpringSecurityDemoApplicationTests {
 
-	@Autowired
+	/*@Autowired
 	UserDao userDao;
 	@Test
 	void contextLoads() {
@@ -30,7 +31,6 @@ class SpringSecurityDemoApplicationTests {
 		r1.setNameZh("管理员");
 		rs1.add(r1);
 		u1.setRoles(rs1);
-		userDao.save(u1);
 		User u2 = new User();
 		u2.setUsername("norpu");
 		u2.setPassword("123");
@@ -44,7 +44,15 @@ class SpringSecurityDemoApplicationTests {
 		r2.setNameZh("普通用户");
 		rs2.add(r2);
 		u2.setRoles(rs2);
-		userDao.save(u2);
-	}
+	}*/
+	@Autowired
+	UserMapper userMapper;
 
+	@Test
+	void testSelect() {
+		System.out.println(("----- selectAll method test ------"));
+		List<User> userList = userMapper.selectList(null);
+		Assert.isTrue(2 == userList.size(), "");
+		userList.forEach(System.out::println);
+	}
 }

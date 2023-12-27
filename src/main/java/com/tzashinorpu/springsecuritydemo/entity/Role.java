@@ -1,22 +1,19 @@
 package com.tzashinorpu.springsecuritydemo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 import java.io.Serializable;
 
-@Entity(name = "sys_role")
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@TableName("sys_role")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
 public class Role implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
     private String nameZh;
-    //省略 getter/setter
 
 
     public Long getId() {
@@ -41,5 +38,14 @@ public class Role implements Serializable {
 
     public void setNameZh(String nameZh) {
         this.nameZh = nameZh;
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", nameZh='" + nameZh + '\'' +
+            '}';
     }
 }

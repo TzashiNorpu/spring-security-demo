@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tzashinorpu.springsecuritydemo.mapper.UserMapper">
+    <resultMap id="user" type="com.tzashinorpu.springsecuritydemo.entity.User">
+        <result property="id" column="uid"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="accountNonExpired" column="accountNonExpired"/>
+        <result property="accountNonLocked" column="accountNonLocked"/>
+        <result property="credentialsNonExpired" column="credentialsNonExpired"/>
+        <result property="enabled" column="enabled"/>
+        <collection property="roles" ofType="com.tzashinorpu.springsecuritydemo.entity.Role">
+            <result property="id" column="rid"/>
+            <result property="name" column="name"/>
+            <result property="nameZh" column="nameZh"/>
+        </collection>
+    </resultMap>
+    <select id="loadUserByUsername" resultMap="user">
+        select
+        t.id uid,
+        t.username ,
+        t.password ,
+        t.account_non_expired accountNonExpired,
+        t.account_non_locked accountNonLocked,
+        t.credentials_non_expired credentialsNonExpired,
+        t.enabled ,
+        r.id rid,
+        r.name ,
+        r.name_zh nameZh
+        from t_user t, t_user_roles c,sys_role r
+        where t.id = c.t_user_id
+        and c.roles_id = r.id
+        and t.username =#{username}
+    </select>
+</mapper>
