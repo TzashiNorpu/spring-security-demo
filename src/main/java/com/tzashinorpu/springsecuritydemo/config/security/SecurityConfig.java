@@ -31,6 +31,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.LazyCsrfTokenRepository;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -126,8 +128,8 @@ public class SecurityConfig<S extends Session> {
 
 	/*@Autowired
 	MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;*/
-	@Autowired
-	VerifyCodeFilter verifyCodeFilter;
+/*	@Autowired
+	VerifyCodeFilter verifyCodeFilter;*/
 
 	@Bean
 	SessionRegistryImpl sessionRegistry() {
@@ -142,7 +144,7 @@ public class SecurityConfig<S extends Session> {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http
-//	                                               ,LoginFilter loginFilter
+			, LoginFilter loginFilter
 //                                                 SessionRegistryImpl sessionRegistry
 	) throws Exception {
 //		http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
@@ -159,12 +161,14 @@ public class SecurityConfig<S extends Session> {
                                 .authenticated()
 
                 )
-                .formLogin(
+
+                /*.formLogin(
                         formLoginCustomizer-> formLoginCustomizer
                                         .loginPage("/login.html")
-                                        .loginProcessingUrl("/doLogin")
-                                        .usernameParameter("name")
-                                        .passwordParameter("passwd")
+								                        .usernameParameter("name")
+								                        .passwordParameter("passwd")
+                                        .loginProcessingUrl("/login")
+
 //                                        .authenticationDetailsSource(myWebAuthenticationDetailsSource)
                                         .successHandler((req, resp, authentication) -> {
                                             resp.setContentType("application/json;charset=utf-8");
@@ -181,7 +185,7 @@ public class SecurityConfig<S extends Session> {
                                             out.close();
                                         })
                                         .permitAll()
-                )
+                )*/
                 .logout(logout->logout
 		                // 用 sessionID 退出
                         .logoutUrl("/logout")
@@ -195,7 +199,8 @@ public class SecurityConfig<S extends Session> {
                         .permitAll()
                 )
 //                .rememberMe(remember -> remember.key("back-key").rememberMeCookieName("rem").tokenRepository(jdbcTokenRepository))
-                .csrf(AbstractHttpConfigurer::disable)
+//		        .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf->csrf.csrfTokenRepository(new CookieCsrfTokenRepository())) // js 无法读取
 		            .sessionManagement(session -> session.maximumSessions(1).sessionRegistry(sessionRegistry())/*.maxSessionsPreventsLogin(true)*/)
                 .exceptionHandling(handler->handler
                         .authenticationEntryPoint((req, resp, authException) -> {
@@ -205,7 +210,7 @@ public class SecurityConfig<S extends Session> {
                             out.flush();
                             out.close();
                 }));
-    /*    // @formatter:off
+        // @formatter:off
         http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 				// @formatter:off
         http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry(), event -> {
@@ -216,12 +221,12 @@ public class SecurityConfig<S extends Session> {
             out.write(new ObjectMapper().writeValueAsString(ResponseBean.error("您已在另一台设备登录，本次登录已下线!")));
             out.flush();
             out.close();
-        }), ConcurrentSessionFilter.class);*/
+        }), ConcurrentSessionFilter.class);
 		// @formatter:on
 		return http.build();
 	}
 
-	//	@Bean
+	@Bean
 	public SpringSessionRememberMeServices rememberMeServices() {
 		SpringSessionRememberMeServices rememberMeServices = new SpringSessionRememberMeServices();
 		// optionally customize
@@ -229,15 +234,14 @@ public class SecurityConfig<S extends Session> {
 		return rememberMeServices;
 	}
 
-	//	@Bean
+	@Bean
 	HttpSessionEventPublisher httpSessionEventPublisher() {
 		return new HttpSessionEventPublisher();
 	}
 
 
-	//			@Bean
-	LoginFilter loginFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry) throws
-			Exception {
+	@Bean
+	LoginFilter loginFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry,SpringSessionRememberMeServices rememberMeServices) throws Exception {
 		LoginFilter loginFilter = new LoginFilter();
 		loginFilter.setAuthenticationSuccessHandler(new AuthenticationSuccessHandler() {
 			@Override
@@ -278,7 +282,7 @@ public class SecurityConfig<S extends Session> {
 		loginFilter.setRequiresAuthenticationRequestMatcher(new RequestMatcher() {
 			@Override
 			public boolean matches(HttpServletRequest request) {
-				return request.getPathInfo().equalsIgnoreCase("login.html");
+				return !request.getPathInfo().equalsIgnoreCase("login");
 			}
 		});
 		loginFilter.setAuthenticationManager(authenticationManager);
@@ -287,8 +291,8 @@ public class SecurityConfig<S extends Session> {
 		loginFilter.setSessionAuthenticationStrategy(sessionControlAuthenticationStrategy);
 //		loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
 		loginFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
-		loginFilter.setRememberMeServices(rememberMeServices());
-		loginFilter.setFilterProcessesUrl("/doLogin");
+		loginFilter.setRememberMeServices(rememberMeServices);
+		loginFilter.setFilterProcessesUrl("/login");
 		loginFilter.setUsernameParameter("name");
 		loginFilter.setPasswordParameter("passwd");
 		return loginFilter;

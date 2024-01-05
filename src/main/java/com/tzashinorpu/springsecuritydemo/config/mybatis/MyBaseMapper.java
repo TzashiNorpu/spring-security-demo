@@ -1,4 +1,4 @@
-package com.tzashinorpu.springsecuritydemo.config.mybatis_config;
+package com.tzashinorpu.springsecuritydemo.config.mybatis;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;

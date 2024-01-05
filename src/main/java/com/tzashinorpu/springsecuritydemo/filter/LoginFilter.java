@@ -21,6 +21,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Autowired
 	SessionRegistry sessionRegistry;
+
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 		if (!request.getMethod().equals("POST")) {
@@ -37,7 +38,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			} catch (IOException e) {
 			} finally {
 				String code = loginData.get("code");
-				checkCode(response, code, verify_code);
+//				checkCode(response, code, verify_code);
 			}
 			String usernameParameter = getUsernameParameter();
 			String username = loginData.get(usernameParameter);
