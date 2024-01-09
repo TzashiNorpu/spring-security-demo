@@ -1,9 +1,9 @@
 package com.tzashinorpu.springsecuritydemo.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.tzashinorpu.springsecuritydemo.entity.User;
+import com.tzashinorpu.springsecuritydemo.config.security.CustomUserDetail;
 import com.tzashinorpu.springsecuritydemo.mapper.UserMapper;
+import com.tzashinorpu.springsecuritydemo.pojo.dto.UserRegisterDTO;
+import com.tzashinorpu.springsecuritydemo.pojo.vo.UserRegisterVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,10 +17,15 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userMapper.loadUserByUsername(username);
+        CustomUserDetail user = userMapper.loadUserByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("用户不存在");
         }
         return user;
+    }
+
+    public UserRegisterVO userRegister(UserRegisterDTO dto){
+        UserRegisterVO vo = new UserRegisterVO();
+        return vo;
     }
 }

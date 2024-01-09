@@ -1,14 +1,12 @@
 package com.tzashinorpu.springsecuritydemo;
 
-import com.tzashinorpu.springsecuritydemo.entity.Role;
-import com.tzashinorpu.springsecuritydemo.entity.User;
+import com.tzashinorpu.springsecuritydemo.pojo.po.UserPO;
 import com.tzashinorpu.springsecuritydemo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -51,7 +49,7 @@ class SpringSecurityDemoApplicationTests {
 	@Test
 	void testSelect() {
 		System.out.println(("----- selectAll method test ------"));
-		List<User> userList = userMapper.selectList(null);
+		List<UserPO> userList = userMapper.selectList(null);
 		Assert.isTrue(2 == userList.size(), "");
 		userList.forEach(System.out::println);
 	}

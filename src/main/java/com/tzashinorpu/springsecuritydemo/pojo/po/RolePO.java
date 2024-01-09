@@ -1,4 +1,4 @@
-package com.tzashinorpu.springsecuritydemo.entity;
+package com.tzashinorpu.springsecuritydemo.pojo.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @TableName("sys_role")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
-public class Role implements Serializable {
+public class RolePO implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String name;

@@ -1,11 +1,6 @@
-package com.tzashinorpu.springsecuritydemo.entity;
+package com.tzashinorpu.springsecuritydemo.config.security;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.apache.ibatis.type.JdbcType;
+import com.tzashinorpu.springsecuritydemo.pojo.po.RolePO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,31 +11,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.apache.catalina.realm.UserDatabaseRealm.getRoles;
-
-@TableName("t_user")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
-public class User implements UserDetails {
-    @TableId(type = IdType.AUTO)
+public class CustomUserDetail implements UserDetails {
     private Long id;
     private String username;
     private String password;
-    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean accountNonExpired;
-    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean accountNonLocked;
-    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean credentialsNonExpired;
-    @TableField(jdbcType = JdbcType.BOOLEAN)
     private boolean enabled;
-    private List<Role> roles;
+    private List<RolePO> roles;
 
 
     List<SimpleGrantedAuthority> authorities;
 
     private void setAuthorities(){
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : getRoles()) {
+        for (RolePO role : getRoles()) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         this.authorities = authorities;
@@ -113,11 +99,11 @@ public class User implements UserDetails {
         this.enabled = enabled;
     }
 
-    public List<Role> getRoles() {
+    public List<RolePO> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<RolePO> roles) {
         this.roles = roles;
     }
 
@@ -125,7 +111,7 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
+        CustomUserDetail user = (CustomUserDetail) o;
         return Objects.equals(username, user.username);
     }
 
@@ -136,7 +122,7 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
-        String roles_flatten = roles.stream().map(Role::toString).collect(Collectors.joining(","));
+        String roles_flatten = roles.stream().map(RolePO::toString).collect(Collectors.joining(","));
         return "User{" +
             "id=" + id +
             ", username='" + username + '\'' +

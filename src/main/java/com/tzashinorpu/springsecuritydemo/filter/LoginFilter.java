@@ -1,7 +1,7 @@
 package com.tzashinorpu.springsecuritydemo.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tzashinorpu.springsecuritydemo.entity.User;
+import com.tzashinorpu.springsecuritydemo.pojo.po.UserPO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +54,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
 					username, password);
 			setDetails(request, authRequest);
-			User user = new User();
-			user.setUsername(username);
+			UserPO user = new UserPO();
+//			user.setUsername(username);
 			sessionRegistry.registerNewSession(request.getSession(true).getId(), user);
 			return this.getAuthenticationManager().authenticate(authRequest);
 		} else {

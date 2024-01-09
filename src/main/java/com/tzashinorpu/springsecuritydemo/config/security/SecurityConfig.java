@@ -3,8 +3,7 @@ package com.tzashinorpu.springsecuritydemo.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.tzashinorpu.springsecuritydemo.custom.MyWebAuthenticationDetailsSource;
 import com.tzashinorpu.springsecuritydemo.filter.LoginFilter;
-import com.tzashinorpu.springsecuritydemo.filter.VerifyCodeFilter;
-import com.tzashinorpu.springsecuritydemo.model.ResponseBean;
+import com.tzashinorpu.springsecuritydemo.pojo.vo.ResponseWrapper;
 import com.tzashinorpu.springsecuritydemo.repo.JdbcTokenRepositoryImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,13 +16,11 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -32,13 +29,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.LazyCsrfTokenRepository;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
-import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 
@@ -52,8 +46,8 @@ public class SecurityConfig<S extends Session> {
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
-//		return new BCryptPasswordEncoder();
+//		return NoOpPasswordEncoder.getInstance();
+		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
@@ -64,12 +58,17 @@ public class SecurityConfig<S extends Session> {
 	}
 
 	@Bean
-	public AuthenticationManager authenticationManager(UserDetailsService userService, PasswordEncoder passwordEncoder) {
+	public AuthenticationManager authenticationManager(UserDetailsService userService, PasswordEncoder passwordEncoder/*, AuthenticationManagerBuilder builder*/) {
 		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 		authenticationProvider.setUserDetailsService(userService);
 		authenticationProvider.setPasswordEncoder(passwordEncoder);
-
 		return new ProviderManager(authenticationProvider);
+		/*builder.authenticationProvider(authenticationProvider);
+		try {
+			return builder.build();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}*/
 	}
 
 	/*@Bean
@@ -131,38 +130,35 @@ public class SecurityConfig<S extends Session> {
 /*	@Autowired
 	VerifyCodeFilter verifyCodeFilter;*/
 
-	@Bean
+/*	@Bean
 	SessionRegistryImpl sessionRegistry() {
 		return new SessionRegistryImpl();
-	}
-/*	@Autowired
+	}*/
+	@Autowired
 	FindByIndexNameSessionRepository<S> sessionRepository;
 	@Bean
 	SpringSessionBackedSessionRegistry<S> sessionRegistry() {
 		return new SpringSessionBackedSessionRegistry<>(this.sessionRepository);
-	}*/
+	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http
 			, LoginFilter loginFilter
-//                                                 SessionRegistryImpl sessionRegistry
+                               ,                  SessionRegistry sessionRegistry
 	) throws Exception {
 //		http.addFilterBefore(verifyCodeFilter, UsernamePasswordAuthenticationFilter.class);
-
 		// @formatter:off
         http
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/js/**", "/css/**","/verify-code/**")
-                                .permitAll()
+                                .requestMatchers("/verify-code/**","/login/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole("admin")
                                 .requestMatchers("/user/**").hasRole("user")
-                                .anyRequest()
-                                .authenticated()
+                                .anyRequest().authenticated()
 
                 )
-
-                /*.formLogin(
+/*
+                .formLogin(
                         formLoginCustomizer-> formLoginCustomizer
                                         .loginPage("/login.html")
 								                        .usernameParameter("name")
@@ -192,7 +188,7 @@ public class SecurityConfig<S extends Session> {
                         .logoutSuccessHandler((req, resp, authentication) -> {
                             resp.setContentType("application/json;charset=utf-8");
                             PrintWriter out = resp.getWriter();
-		                        out.write(new ObjectMapper().writeValueAsString(ResponseBean.error("注销成功")));
+		                        out.write(new ObjectMapper().writeValueAsString(ResponseWrapper.error("注销成功")));
                             out.flush();
                             out.close();
                         })
@@ -206,19 +202,19 @@ public class SecurityConfig<S extends Session> {
                         .authenticationEntryPoint((req, resp, authException) -> {
                             resp.setContentType("application/json;charset=utf-8");
                             PrintWriter out = resp.getWriter();
-		                        out.write(new ObjectMapper().writeValueAsString(ResponseBean.error("尚未登录，请先登录")));
+		                        out.write(new ObjectMapper().writeValueAsString(ResponseWrapper.error("尚未登录，请先登录")));
                             out.flush();
                             out.close();
                 }));
-        // @formatter:off
-        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+// @formatter:off
+		http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 				// @formatter:off
-        http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry(), event -> {
+        http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry, event -> {
             HttpServletResponse resp = event.getResponse();
             resp.setContentType("application/json;charset=utf-8");
             resp.setStatus(401);
             PrintWriter out = resp.getWriter();
-            out.write(new ObjectMapper().writeValueAsString(ResponseBean.error("您已在另一台设备登录，本次登录已下线!")));
+            out.write(new ObjectMapper().writeValueAsString(ResponseWrapper.error("您已在另一台设备登录，本次登录已下线!")));
             out.flush();
             out.close();
         }), ConcurrentSessionFilter.class);
@@ -241,28 +237,47 @@ public class SecurityConfig<S extends Session> {
 
 
 	@Bean
-	LoginFilter loginFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry,SpringSessionRememberMeServices rememberMeServices) throws Exception {
+	LoginFilter loginFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry, SpringSessionRememberMeServices rememberMeServices) throws Exception {
 		LoginFilter loginFilter = new LoginFilter();
-		loginFilter.setAuthenticationSuccessHandler(new AuthenticationSuccessHandler() {
+		loginFilter.setFilterProcessesUrl("/login");
+		loginFilter.setUsernameParameter("name");
+		loginFilter.setPasswordParameter("passwd");
+		loginFilter.setAuthenticationSuccessHandler(getSuccessHandler());
+		loginFilter.setAuthenticationFailureHandler(getFailureHandler());
+		loginFilter.setAuthenticationManager(authenticationManager);
+		ConcurrentSessionControlAuthenticationStrategy sessionControlAuthenticationStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
+		sessionControlAuthenticationStrategy.setMaximumSessions(1);
+		loginFilter.setSessionAuthenticationStrategy(sessionControlAuthenticationStrategy);
+//		loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
+		loginFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
+		loginFilter.setRememberMeServices(rememberMeServices);
+		return loginFilter;
+	}
+
+	private static AuthenticationSuccessHandler getSuccessHandler() {
+		return new AuthenticationSuccessHandler() {
 			@Override
 			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 				response.setContentType("application/json;charset=utf-8");
 				PrintWriter out = response.getWriter();
 				Object object = authentication.getPrincipal();
 //				object.setPassword(null);
-				ResponseBean ok = ResponseBean.ok("登录成功!", object);
+				ResponseWrapper ok = ResponseWrapper.ok("登录成功!", object);
 				String s = new ObjectMapper().writeValueAsString(ok);
 				out.write(s);
 				out.flush();
 				out.close();
 			}
-		});
-		loginFilter.setAuthenticationFailureHandler(new AuthenticationFailureHandler() {
+		};
+	}
+
+	private static AuthenticationFailureHandler getFailureHandler() {
+		return new AuthenticationFailureHandler() {
 			@Override
 			public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 				response.setContentType("application/json;charset=utf-8");
 				PrintWriter out = response.getWriter();
-				ResponseBean respBean = ResponseBean.error(exception.getMessage());
+				ResponseWrapper respBean = ResponseWrapper.error(exception.getMessage());
 				if (exception instanceof LockedException) {
 					respBean.setMsg("账户被锁定，请联系管理员!");
 				} else if (exception instanceof CredentialsExpiredException) {
@@ -278,23 +293,6 @@ public class SecurityConfig<S extends Session> {
 				out.flush();
 				out.close();
 			}
-		});
-		loginFilter.setRequiresAuthenticationRequestMatcher(new RequestMatcher() {
-			@Override
-			public boolean matches(HttpServletRequest request) {
-				return !request.getPathInfo().equalsIgnoreCase("login");
-			}
-		});
-		loginFilter.setAuthenticationManager(authenticationManager);
-		ConcurrentSessionControlAuthenticationStrategy sessionControlAuthenticationStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
-		sessionControlAuthenticationStrategy.setMaximumSessions(1);
-		loginFilter.setSessionAuthenticationStrategy(sessionControlAuthenticationStrategy);
-//		loginFilter.setAuthenticationDetailsSource(myWebAuthenticationDetailsSource);
-		loginFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
-		loginFilter.setRememberMeServices(rememberMeServices);
-		loginFilter.setFilterProcessesUrl("/login");
-		loginFilter.setUsernameParameter("name");
-		loginFilter.setPasswordParameter("passwd");
-		return loginFilter;
+		};
 	}
 }

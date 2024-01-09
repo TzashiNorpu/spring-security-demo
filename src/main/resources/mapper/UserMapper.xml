@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.tzashinorpu.springsecuritydemo.mapper.UserMapper">
-    <resultMap id="user" type="com.tzashinorpu.springsecuritydemo.entity.User">
+    <resultMap id="user" type="com.tzashinorpu.springsecuritydemo.config.security.CustomUserDetail">
         <result property="id" column="uid"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
@@ -9,7 +9,7 @@
         <result property="accountNonLocked" column="accountNonLocked"/>
         <result property="credentialsNonExpired" column="credentialsNonExpired"/>
         <result property="enabled" column="enabled"/>
-        <collection property="roles" ofType="com.tzashinorpu.springsecuritydemo.entity.Role">
+        <collection property="roles" ofType="com.tzashinorpu.springsecuritydemo.pojo.po.RolePO">
             <result property="id" column="rid"/>
             <result property="name" column="name"/>
             <result property="nameZh" column="nameZh"/>
