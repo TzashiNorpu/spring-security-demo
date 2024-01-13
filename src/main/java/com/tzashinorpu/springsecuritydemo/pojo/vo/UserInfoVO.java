@@ -1,4 +1,4 @@
 package com.tzashinorpu.springsecuritydemo.pojo.vo;
 
-public class UserInfoVO {
+public class UserInfoVO extends BaseVO{
 }

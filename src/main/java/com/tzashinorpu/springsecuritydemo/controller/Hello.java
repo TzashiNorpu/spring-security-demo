@@ -41,7 +41,7 @@ public class Hello {
 	@Autowired
 	AuthenticationManager authenticationManager;
 
-	@PostMapping("/login")
+		@PostMapping("/login")
 	public Object login(@RequestBody LoginReq req) {
 		String account = req.getAccount();
 		String pwd = req.getPwd();

@@ -13,7 +13,7 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
-@Component
+//@Component
 public class VerifyCodeFilter extends GenericFilterBean {
 
 	@Override

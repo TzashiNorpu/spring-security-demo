@@ -2,21 +2,28 @@ package com.tzashinorpu.springsecuritydemo.pojo.po;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
-public class BasePO {
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@Data
+public class BasePO<T extends Model<?>> extends Model<T> {
 	@TableField(fill = FieldFill.INSERT)
-	private Date create_time;
+	private LocalDateTime createTime;
 	@TableField(fill = FieldFill.INSERT_UPDATE)
-	private Date update_time;
+	private LocalDateTime updateTime;
 	@TableField(fill = FieldFill.INSERT)
-	private String created_by;
+	private Long createdBy;
 	@TableField(fill = FieldFill.INSERT_UPDATE)
-	private String update_by;
-	// 乐观锁
-	@Version
-	private Integer version;
-
+	private Long updateBy;
+		// 逻辑删除标识
+	@TableLogic
+	private boolean deleted;
 }

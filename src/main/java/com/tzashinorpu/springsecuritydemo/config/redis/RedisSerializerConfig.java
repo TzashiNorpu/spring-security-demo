@@ -2,7 +2,6 @@ package com.tzashinorpu.springsecuritydemo.config.redis;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.tzashinorpu.springsecuritydemo.custom.MyWebAuthenticationDetails;
 import com.tzashinorpu.springsecuritydemo.mixin.LongMixin;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.context.annotation.Bean;

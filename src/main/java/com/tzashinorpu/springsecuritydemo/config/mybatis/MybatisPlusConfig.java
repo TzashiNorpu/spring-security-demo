@@ -16,8 +16,10 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.aop.interceptor.PerformanceMonitorInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.sql.DataSource;
@@ -27,7 +29,6 @@ import java.util.List;
  * Mybatis Plus Config
  */
 @Configuration
-@MapperScan("com.tzashinorpu.springsecuritydemo.mapper")
 public class MybatisPlusConfig {
 
 	@Bean("mybatisSqlSession")
@@ -47,7 +48,9 @@ public class MybatisPlusConfig {
 		/* 驼峰转下划线 */
 		configuration.setMapUnderscoreToCamelCase(true);
 		MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+		// 分页插件
 		mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+		// 乐观锁插件
 		mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
 		sqlSessionFactory.setPlugins(mybatisPlusInterceptor);
 		/* map 下划线转驼峰 */
@@ -57,6 +60,14 @@ public class MybatisPlusConfig {
 		globalConfig.setMetaObjectHandler(new MysqlMetaObjectHandler());
 		sqlSessionFactory.setGlobalConfig(globalConfig);
 		return sqlSessionFactory.getObject();
+	}
+	// 性能分析插件
+	@Bean
+	@Profile({"dev"})
+	public PerformanceMonitorInterceptor performanceMonitorInterceptor(){
+		PerformanceMonitorInterceptor interceptor = new PerformanceMonitorInterceptor();
+		interceptor.setPrefix("per");
+		return interceptor;
 	}
 
 	@Bean

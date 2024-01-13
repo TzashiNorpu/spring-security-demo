@@ -1,10 +1,11 @@
-package com.tzashinorpu.springsecuritydemo.filter;
+package com.tzashinorpu.springsecuritydemo.config.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tzashinorpu.springsecuritydemo.pojo.po.UserPO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +25,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		if (!request.getMethod().equals("POST")) {
+		if (!request.getMethod().equals(HttpMethod.POST.name())) {
 			throw new AuthenticationServiceException(
 					"Authentication method not supported: " + request.getMethod());
 		}
