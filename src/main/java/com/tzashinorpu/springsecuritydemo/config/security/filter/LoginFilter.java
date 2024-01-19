@@ -1,7 +1,7 @@
 package com.tzashinorpu.springsecuritydemo.config.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tzashinorpu.springsecuritydemo.pojo.po.UserPO;
+import com.tzashinorpu.springsecuritydemo.pojo.po.SysUserPO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 					"Authentication method not supported: " + request.getMethod());
 		}
 
-		String verify_code = (String) request.getSession().getAttribute("verify_code");
+//		String verify_code = (String) request.getSession().getAttribute("verify_code");
 		String contentType = request.getContentType();
 		if (contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE) || contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_UTF8_VALUE)) {
 			Map<String, String> loginData = new HashMap<>();
@@ -55,12 +55,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
 					username, password);
 			setDetails(request, authRequest);
-			UserPO user = new UserPO();
+			SysUserPO user = new SysUserPO();
 //			user.setUsername(username);
-			sessionRegistry.registerNewSession(request.getSession(true).getId(), user);
+//			sessionRegistry.registerNewSession(request.getSession(true).getId(), user);
 			return this.getAuthenticationManager().authenticate(authRequest);
 		} else {
-			checkCode(response, request.getParameter("code"), verify_code);
+//			checkCode(response, request.getParameter("code"), verify_code);
 			return super.attemptAuthentication(request, response);
 		}
 	}

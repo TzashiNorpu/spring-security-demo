@@ -2,6 +2,7 @@ package com.tzashinorpu.springsecuritydemo.config.mybatis;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.tzashinorpu.springsecuritydemo.config.security.CustomUserDetail;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 /**
  * 测试，自定义元对象字段填充控制器，实现公共字段自动写入
  */
+@Slf4j
 public class MysqlMetaObjectHandler implements MetaObjectHandler {
 
 	/**
@@ -24,8 +26,7 @@ public class MysqlMetaObjectHandler implements MetaObjectHandler {
 		// create_time 是实体对象属性名
 		if (metaObject.hasGetter("createTime") && metaObject.getValue("createTime") == null)
 			this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
-		if (metaObject.hasGetter("updateTime") && metaObject.getValue("updateTime") == null)
-			this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+
 		// accountNonExpired
 		if (metaObject.hasGetter("accountNonExpired") && metaObject.getValue("accountNonExpired") == null)
 			this.strictInsertFill(metaObject, "accountNonExpired", Boolean.class, false);
@@ -39,25 +40,18 @@ public class MysqlMetaObjectHandler implements MetaObjectHandler {
 		if (metaObject.hasGetter("enabled") && metaObject.getValue("enabled") == null)
 			this.strictInsertFill(metaObject, "enabled", Boolean.class, true);
 
-		if (metaObject.hasGetter("createdBy") && metaObject.getValue("createdBy") == null) {
-			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long userId;
+		if (metaObject.hasGetter("createBy") && metaObject.getValue("createBy") == null) {
+			Object principal = null;
+			try {
+				principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			} catch (Exception e) {
+				log.debug("SecurityContextHolder 获取用户失败");
+			}
+			Long userId = 999999L;
 			if (principal instanceof CustomUserDetail)
 				userId = ((CustomUserDetail) principal).getId();
-			else userId = (Long) metaObject.getValue("id");
-			this.strictInsertFill(metaObject, "createdBy", Long.class, userId);
+			this.strictInsertFill(metaObject, "createBy", Long.class, userId);
 		}
-
-		if (metaObject.hasGetter("updateBy") && metaObject.getValue("updateBy") == null) {
-			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long userId;
-			if (principal instanceof CustomUserDetail)
-				userId = ((CustomUserDetail) principal).getId();
-			else
-				userId = (Long) metaObject.getValue("id");
-			this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
-		}
-
 
 		/*// 测试下划线
 		Object createDatetime = this.getFieldValByName("createDatetime", metaObject);
@@ -76,7 +70,6 @@ public class MysqlMetaObjectHandler implements MetaObjectHandler {
 		System.out.println("*************************");
 		if (metaObject.hasGetter("updateTime") && metaObject.getValue("updateTime") == null)
 			this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
-
 
 		if (metaObject.hasGetter("updateBy") && metaObject.getValue("updateBy") == null) {
 			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

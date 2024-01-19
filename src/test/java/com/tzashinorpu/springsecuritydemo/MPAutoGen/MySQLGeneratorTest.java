@@ -1,10 +1,13 @@
 package com.tzashinorpu.springsecuritydemo.MPAutoGen;
 
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
-import com.baomidou.mybatisplus.generator.fill.Column;
+import com.baomidou.mybatisplus.generator.config.OutputFile;
+import com.baomidou.mybatisplus.generator.config.po.LikeTable;
+import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
+import com.tzashinorpu.springsecuritydemo.pojo.po.BasePO;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -40,24 +43,70 @@ public class MySQLGeneratorTest extends BaseGeneratorTest {
 		return "all".equals(tables) ? Collections.emptyList() : Arrays.asList(tables.split(","));
 	}
 
+
 	@Test
 	public void myTest() {
+		String pkgName = "com.tzashinorpu.springsecuritydemo";
+		String outputDir = "D://tmp";
 		FastAutoGenerator.create(DATA_SOURCE_CONFIG)
 				// 全局配置
-				.globalConfig((scanner, builder) -> builder.author(scanner.apply("请输入作者名称？")))
+				.globalConfig(
+						builder -> {
+							builder.author("tzashinorpu") // 设置作者
+									.enableSwagger() // 开启 swagger 模式
+									.outputDir(outputDir) // 指定输出目录
+							;
+						}
+				)
 				// 包配置
-				.packageConfig((scanner, builder) -> builder.parent(scanner.apply("请输入包名？")))
+				.packageConfig(
+						builder -> {
+
+							builder.parent(pkgName) // 设置父包名
+									.entity("pojo.po")  // Entity 包名
+//								.moduleName("system") // 设置父包模块名
+									// resources\mapper
+									.pathInfo(Collections.singletonMap(OutputFile.xml, outputDir)
+									) // 设置mapperXml生成路径
+							;
+						}
+				)
 				// 策略配置
-				.strategyConfig((scanner, builder) -> builder.addInclude(getTables(scanner.apply("请输入表名，多个英文逗号分隔？所有输入 all")))
-						.controllerBuilder().enableRestStyle().enableHyphenStyle()
-						.entityBuilder().enableLombok().addTableFills(
-								new Column("create_time", FieldFill.INSERT)
-						).build())
-				/*
-						模板引擎配置，默认 Velocity 可选模板引擎 Beetl 或 Freemarker
-					 .templateEngine(new BeetlTemplateEngine())
-					 .templateEngine(new FreemarkerTemplateEngine())
-				 */
+				.strategyConfig(
+						builder -> {
+							builder.enableCapitalMode()
+									/*.enableSkipView()*/
+//									.disableSqlFilter()
+//									.likeTable(new LikeTable("sys_dept"))
+									.entityBuilder()
+									.superClass(BasePO.class)  // 设置父类
+									.enableChainModel()
+									.enableLombok()
+									.enableRemoveIsPrefix()
+									.enableTableFieldAnnotation()
+									.enableActiveRecord()
+									.versionColumnName("version")
+									//.versionPropertyName("version")
+									.logicDeleteColumnName("deleted")
+									//.logicDeletePropertyName("deleteFlag")
+									.naming(NamingStrategy.underline_to_camel)
+									.columnNaming(NamingStrategy.underline_to_camel)
+									.addSuperEntityColumns("id", "created_by", "created_time", "updated_by", "updated_time", "deleted")
+//									.addIgnoreColumns("age")
+/*									.addTableFills(new Column("create_time", FieldFill.INSERT_UPDATE))
+									.addTableFills(new Column("updateTime", FieldFill.INSERT_UPDATE))
+									.addTableFills(new Column("created_by", FieldFill.INSERT_UPDATE))
+									.addTableFills(new Column("update_by", FieldFill.INSERT_UPDATE))*/
+									.idType(IdType.ASSIGN_ID)
+									.formatFileName("%sPO")
+									.enableFileOverride()
+									.serviceBuilder()
+									.formatServiceFileName("%sService")
+									.formatServiceImplFileName("%sServiceImpl")
+									.enableFileOverride()
+							;
+						}
+				)
 				.execute();
 	}
 }

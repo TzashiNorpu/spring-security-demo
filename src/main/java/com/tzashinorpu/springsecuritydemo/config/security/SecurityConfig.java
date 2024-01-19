@@ -55,6 +55,7 @@ public class SecurityConfig<S extends Session> {
 	FindByIndexNameSessionRepository<S> sessionRepository;
 	@Autowired
 	private ApplicationEventPublisher publisher;
+
 	private AuthenticationSuccessHandler getSuccessHandler() {
 		return new AuthenticationSuccessHandler() {
 			@Override
@@ -176,11 +177,12 @@ public class SecurityConfig<S extends Session> {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginFilter loginFilter, SessionRegistry sessionRegistry) throws Exception {
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/verify-code/**", "/login/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/user/**").permitAll()
-						.requestMatchers("/admin/**").hasRole("admin")
-						.requestMatchers("/user/**").hasRole("user")
-						.anyRequest().authenticated())
+		http.authorizeHttpRequests(authorize ->
+						authorize.requestMatchers("/verify-code", "/login", "/api/**").permitAll()
+								.requestMatchers(HttpMethod.POST, "/user/**").permitAll()
+								.requestMatchers(HttpMethod.POST, "/role/**").permitAll()
+								.requestMatchers("/admin/**").hasRole("admin")
+								.anyRequest().authenticated())
 				// 用 sessionID 退出
 				.logout(logout -> logout.logoutUrl("/logout")
 						.logoutSuccessHandler((req, resp, authentication) -> {
@@ -194,13 +196,13 @@ public class SecurityConfig<S extends Session> {
 				.csrf(AbstractHttpConfigurer::disable)
 //				.csrf(csrf -> csrf.csrfTokenRepository(new CookieCsrfTokenRepository()))// js 无法读取
 				.sessionManagement(session -> session.maximumSessions(1).sessionRegistry(sessionRegistry())/*.maxSessionsPreventsLogin(true)*/)
-				.exceptionHandling(handler -> handler.authenticationEntryPoint((req, resp, authException) -> {
+				/*.exceptionHandling(handler -> handler.authenticationEntryPoint((req, resp, authException) -> {
 					resp.setContentType("application/json;charset=utf-8");
 					PrintWriter out = resp.getWriter();
 					out.write(new ObjectMapper().writeValueAsString(ResponseResult.error("尚未登录，请先登录")));
 					out.flush();
 					out.close();
-				}))
+				}))*/
 				.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
 				.addFilterAt(new ConcurrentSessionFilter(sessionRegistry, event -> {
 					HttpServletResponse resp = event.getResponse();

@@ -12,7 +12,7 @@ public class LoginSuccessListener implements ApplicationListener<LoginSuccessEve
 	@Override
 	public void onApplicationEvent(LoginSuccessEvent event) {
 		log.debug("event from " + event.getSource() + " happened!");
-		String userName = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		log.debug("current user is :" + userName);
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		log.debug("current user is :" + principal);
 	}
 }

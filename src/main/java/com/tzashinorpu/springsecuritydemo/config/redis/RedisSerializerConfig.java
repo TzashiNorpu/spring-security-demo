@@ -27,6 +27,7 @@ public class RedisSerializerConfig implements BeanClassLoaderAware {
 	/**
 	 * Customized {@link ObjectMapper} to add mix-in for class that doesn't have default
 	 * constructors
+	 *
 	 * @return the {@link ObjectMapper} to use
 	 */
 	private ObjectMapper objectMapper() {

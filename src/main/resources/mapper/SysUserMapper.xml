@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.tzashinorpu.springsecuritydemo.mapper.UserMapper">
+<mapper namespace="com.tzashinorpu.springsecuritydemo.mapper.SysUserMapper">
     <resultMap id="user" type="com.tzashinorpu.springsecuritydemo.config.security.CustomUserDetail">
         <result property="id" column="uid"/>
         <result property="username" column="username"/>
@@ -9,7 +9,7 @@
         <result property="accountNonLocked" column="accountNonLocked"/>
         <result property="credentialsNonExpired" column="credentialsNonExpired"/>
         <result property="enabled" column="enabled"/>
-        <collection property="roles" ofType="com.tzashinorpu.springsecuritydemo.pojo.po.RolePO">
+        <collection property="roles" ofType="com.tzashinorpu.springsecuritydemo.pojo.po.SysRolePO">
             <result property="id" column="rid"/>
             <result property="name" column="name"/>
             <result property="nameZh" column="nameZh"/>
@@ -27,9 +27,9 @@
         r.id rid,
         r.name ,
         r.name_zh nameZh
-        from sys_user t, sys_user_roles c,sys_role r
-        where t.id = c.t_user_id
-        and c.roles_id = r.id
+        from sys_user t, sys_user_role c,sys_role r
+        where t.id = c.user_id
+        and c.role_id = r.id
         and t.username =#{username}
     </select>
 </mapper>

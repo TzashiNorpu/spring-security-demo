@@ -1,10 +1,17 @@
 package com.tzashinorpu.springsecuritydemo.pojo.vo;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.Accessors;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class UserVO extends BaseVO{
+@Getter
+@Setter
+@Accessors(chain = true)
+@NoArgsConstructor
+public class UserVO extends BaseVO<UserVO> {
 	private Long userId;
+	private String userName;
+
+	public UserVO(Long userId, String userName) {
+		super(new UserVO(userId, userName));
+	}
 }

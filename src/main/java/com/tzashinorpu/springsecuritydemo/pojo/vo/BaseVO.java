@@ -1,17 +1,22 @@
 package com.tzashinorpu.springsecuritydemo.pojo.vo;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-public class BaseVO {
-	// 业务状态
-	Long code;
-	// 业务描述
-	String msg;
 
-	public BaseVO(Long id, String msg) {
-		this.code = id;
-		this.msg = msg;
+// BaseVO 返回正常交易的数据，在 ControllerAdvice 中增加 code 和 msg
+@Getter
+@Setter
+@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class BaseVO<T> {
+	// 返回数据
+	T data;
+
+	public BaseVO(T data) {
+		this.data = data;
 	}
 
 	public BaseVO() {

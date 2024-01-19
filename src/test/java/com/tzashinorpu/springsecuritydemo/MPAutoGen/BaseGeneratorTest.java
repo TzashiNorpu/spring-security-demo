@@ -22,7 +22,7 @@ public class BaseGeneratorTest {
 	 */
 	protected static void initDataSource(DataSourceConfig dataSourceConfig) throws SQLException {
 		Connection conn = dataSourceConfig.getConn();
-		InputStream inputStream = MySQLGeneratorTest.class.getResourceAsStream("/sql/init.sql");
+		InputStream inputStream = MySQLGeneratorTest.class.getResourceAsStream("/csv/init.sql");
 		ScriptRunner scriptRunner = new ScriptRunner(conn);
 		scriptRunner.setAutoCommit(true);
 		assert inputStream != null;

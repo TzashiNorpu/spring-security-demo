@@ -1,7 +1,7 @@
 package com.tzashinorpu.springsecuritydemo;
 
-import com.tzashinorpu.springsecuritydemo.pojo.po.UserPO;
-import com.tzashinorpu.springsecuritydemo.mapper.UserMapper;
+import com.tzashinorpu.springsecuritydemo.pojo.po.SysUserPO;
+import com.tzashinorpu.springsecuritydemo.mapper.SysUserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,13 +44,14 @@ class SpringSecurityDemoApplicationTests {
 		u2.setRoles(rs2);
 	}*/
 	@Autowired
-	UserMapper userMapper;
+	SysUserMapper sysUserMapper;
 
 	@Test
 	void testSelect() {
 		System.out.println(("----- selectAll method test ------"));
-		List<UserPO> userList = userMapper.selectList(null);
+		List<SysUserPO> userList = sysUserMapper.selectList(null);
 		Assert.isTrue(2 == userList.size(), "");
 		userList.forEach(System.out::println);
+
 	}
 }
