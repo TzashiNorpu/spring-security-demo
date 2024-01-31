@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
-import com.baomidou.mybatisplus.generator.config.po.LikeTable;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.tzashinorpu.springsecuritydemo.pojo.po.BasePO;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import java.util.List;
  * @author lanjerry
  * @since 3.5.3
  */
-public class MySQLGeneratorTest extends BaseGeneratorTest {
+public class MySQLGeneratorTest {
 
 	/**
 	 * 数据源配置

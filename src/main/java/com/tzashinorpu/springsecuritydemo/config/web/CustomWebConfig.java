@@ -1,7 +1,7 @@
 package com.tzashinorpu.springsecuritydemo.config.web;
 
-import com.tzashinorpu.springsecuritydemo.enums.ResponseEnums;
-import com.tzashinorpu.springsecuritydemo.exception.CustomBaseException;
+import com.tzashinorpu.springsecuritydemo.constant.enums.ResponseEnums;
+import com.tzashinorpu.springsecuritydemo.exception.CustomException;
 import com.tzashinorpu.springsecuritydemo.pojo.vo.ResponseResult;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class CustomWebConfig {
 //			Throwable e = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			String msg = (String) request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
 			String code = (String) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-			return ResponseResult.error(code,msg);
+			return ResponseResult.error(code, msg);
 		}
 	}
 
@@ -54,8 +54,8 @@ public class CustomWebConfig {
 
 	@RestControllerAdvice
 	public static class CustomExceptionControllerAdvice {
-		@ExceptionHandler(CustomBaseException.class)
-		public ResponseResult customBaseExceptionHandler(CustomBaseException e) {
+		@ExceptionHandler(CustomException.class)
+		public ResponseResult customBaseExceptionHandler(CustomException e) {
 			return ResponseResult.error(e.getCode(), e.getMessage(), e.getData());
 		}
 

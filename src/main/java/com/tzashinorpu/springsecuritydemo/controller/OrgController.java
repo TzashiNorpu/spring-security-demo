@@ -32,6 +32,7 @@ public class OrgController {
 		po.setOrgName(orgDTO.getOrgName());
 		po.setParentCode(orgDTO.getParentCode());
 		po.setAncestors(orgDTO.getAncestors());
+		po.setOrderNum(orgDTO.getOrderNum());
 		return sysOrgService.addOrg(po);
 	}
 
@@ -44,6 +45,7 @@ public class OrgController {
 			po.setOrgName(item.getOrgName());
 			po.setParentCode(item.getParentCode());
 			po.setAncestors(item.getAncestors());
+			po.setOrderNum(item.getOrderNum());
 			pos.add(po);
 		});
 		return sysOrgService.batchAdd(pos);

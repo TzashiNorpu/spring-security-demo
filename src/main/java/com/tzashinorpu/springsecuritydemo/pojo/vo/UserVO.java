@@ -1,6 +1,8 @@
 package com.tzashinorpu.springsecuritydemo.pojo.vo;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
@@ -8,10 +10,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @NoArgsConstructor
 public class UserVO extends BaseVO<UserVO> {
-	private Long userId;
+	private String userCode;
 	private String userName;
 
-	public UserVO(Long userId, String userName) {
-		super(new UserVO(userId, userName));
+	public UserVO(String userCode, String userName) {
+		super(new UserVO(userCode, userName));
 	}
 }

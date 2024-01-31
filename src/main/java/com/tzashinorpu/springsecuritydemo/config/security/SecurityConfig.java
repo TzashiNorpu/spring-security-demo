@@ -1,6 +1,7 @@
 package com.tzashinorpu.springsecuritydemo.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tzashinorpu.springsecuritydemo.config.security.filter.CrypticFilter;
 import com.tzashinorpu.springsecuritydemo.config.security.filter.LoginFilter;
 import com.tzashinorpu.springsecuritydemo.pojo.vo.ResponseResult;
 import com.tzashinorpu.springsecuritydemo.repo.JdbcTokenRepositoryImpl;
@@ -54,26 +55,9 @@ public class SecurityConfig<S extends Session> {
 	@Autowired
 	FindByIndexNameSessionRepository<S> sessionRepository;
 	@Autowired
+	CrypticFilter crypticFilter;
+	@Autowired
 	private ApplicationEventPublisher publisher;
-
-	private AuthenticationSuccessHandler getSuccessHandler() {
-		return new AuthenticationSuccessHandler() {
-			@Override
-			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-				// 抛出登录成功事件
-				publisher.publishEvent(new LoginSuccessEvent("Spring Security login success handler"));
-				response.setContentType("application/json;charset=utf-8");
-				PrintWriter out = response.getWriter();
-				Object object = authentication.getPrincipal();
-//				object.setPassword(null);
-				ResponseResult ok = ResponseResult.ok("登录成功!", object);
-				String s = new ObjectMapper().writeValueAsString(ok);
-				out.write(s);
-				out.flush();
-				out.close();
-			}
-		};
-	}
 
 	/*@Bean
 	MyAuthenticationProvider myAuthenticationProvider(UserDetailsService userService) {
@@ -118,6 +102,25 @@ public class SecurityConfig<S extends Session> {
 /*    @Autowired
     MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;*/
 
+	private AuthenticationSuccessHandler getSuccessHandler() {
+		return new AuthenticationSuccessHandler() {
+			@Override
+			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+				// 抛出登录成功事件
+				publisher.publishEvent(new LoginSuccessEvent("Spring Security login success handler"));
+				response.setContentType("application/json;charset=utf-8");
+				PrintWriter out = response.getWriter();
+				Object object = authentication.getPrincipal();
+//				object.setPassword(null);
+				ResponseResult ok = ResponseResult.ok("登录成功!", object);
+				String s = new ObjectMapper().writeValueAsString(ok);
+				out.write(s);
+				out.flush();
+				out.close();
+			}
+		};
+	}
+
 	private AuthenticationFailureHandler getFailureHandler() {
 		return new AuthenticationFailureHandler() {
 			@Override
@@ -137,16 +140,16 @@ public class SecurityConfig<S extends Session> {
 		};
 	}
 
+	/*@Autowired
+	MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;*/
+/*	@Autowired
+	VerifyCodeFilter verifyCodeFilter;*/
+
 	@Bean
 	PasswordEncoder passwordEncoder() {
 //		return NoOpPasswordEncoder.getInstance();
 		return new BCryptPasswordEncoder();
 	}
-
-	/*@Autowired
-	MyWebAuthenticationDetailsSource myWebAuthenticationDetailsSource;*/
-/*	@Autowired
-	VerifyCodeFilter verifyCodeFilter;*/
 
 	@Bean
 	RoleHierarchy roleHierarchy() {
@@ -203,6 +206,7 @@ public class SecurityConfig<S extends Session> {
 					out.flush();
 					out.close();
 				}))*/
+				.addFilterBefore(crypticFilter, UsernamePasswordAuthenticationFilter.class)
 				.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
 				.addFilterAt(new ConcurrentSessionFilter(sessionRegistry, event -> {
 					HttpServletResponse resp = event.getResponse();
@@ -243,5 +247,10 @@ public class SecurityConfig<S extends Session> {
 		loginFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 		loginFilter.setRememberMeServices(rememberMeServices);
 		return loginFilter;
+	}
+
+	@Bean
+	CrypticFilter crypticFilter(){
+		return new CrypticFilter();
 	}
 }

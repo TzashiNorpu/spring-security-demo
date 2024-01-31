@@ -8,4 +8,5 @@ public class OrgDTO {
 	private String orgName;
 	private String parentCode;
 	private String ancestors;
+	private Short orderNum;
 }

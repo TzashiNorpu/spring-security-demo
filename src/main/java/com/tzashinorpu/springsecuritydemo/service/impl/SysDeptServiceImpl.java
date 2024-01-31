@@ -1,8 +1,8 @@
 package com.tzashinorpu.springsecuritydemo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tzashinorpu.springsecuritydemo.exception.DeptException;
-import com.tzashinorpu.springsecuritydemo.exception.enums.BaseExceptionEnums;
+import com.tzashinorpu.springsecuritydemo.constant.enums.DeptEnums;
+import com.tzashinorpu.springsecuritydemo.exception.CustomException;
 import com.tzashinorpu.springsecuritydemo.mapper.SysDeptMapper;
 import com.tzashinorpu.springsecuritydemo.pojo.po.SysDeptPO;
 import com.tzashinorpu.springsecuritydemo.pojo.vo.DeptVO;
@@ -32,12 +32,12 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDeptPO> im
 		vo.setDeptCode(code);
 		vo.setDeptName(name);
 		boolean exists = lambdaQuery().eq(SysDeptPO::getDeptCode, code).exists();
-		Assert.shouldNotTrue(exists, BaseExceptionEnums.DATA_EXIST, vo);
+		Assert.shouldNotTrue(exists, DeptEnums.DEPT_EXIST, vo);
 		try {
 			boolean inserted = po.insert();
-			Assert.shouldTrue(inserted, BaseExceptionEnums.DATA_INSERT_FAILURE, vo);
+			Assert.shouldTrue(inserted, DeptEnums.DEPT_INSERT_FAILURE, vo);
 		} catch (Exception e) {
-			throw new DeptException(e.getMessage(), vo);
+			throw new CustomException(e.getMessage(), vo);
 		}
 		return vo;
 	}
@@ -53,9 +53,9 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDeptPO> im
 		});
 		try {
 			boolean b = this.saveBatch(list);
-			Assert.shouldTrue(b, BaseExceptionEnums.DATA_INSERT_FAILURE, deptVOS);
+			Assert.shouldTrue(b, DeptEnums.DEPT_INSERT_FAILURE, deptVOS);
 		} catch (Exception e) {
-			throw new DeptException(e.getMessage(), deptVOS);
+			throw new CustomException(e.getMessage(), deptVOS);
 		}
 		return deptVOS;
 	}

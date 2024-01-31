@@ -15,7 +15,7 @@ public class UserRoleVO extends BaseVO<UserRoleVO> {
 	private Integer roleCode;
 	private String roleName;
 
-	public UserRoleVO(Long userId, String userName, Long roleId, String roleName) {
-		super(new UserRoleVO(userId, userName, roleId, roleName));
+	public UserRoleVO(String userCode, String userName, Integer roleCode, String roleName) {
+		super(new UserRoleVO(userCode, userName, roleCode, roleName));
 	}
 }

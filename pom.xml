@@ -90,6 +90,20 @@
             <artifactId>easyexcel</artifactId>
             <version>3.3.3</version>
         </dependency>
+        <!--国密包-->
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.77</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-crypto -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-crypto</artifactId>
+            <version>5.8.25</version>
+        </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity-engine-core -->

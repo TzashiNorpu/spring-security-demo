@@ -5,9 +5,7 @@ import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.excel.util.ListUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tzashinorpu.springsecuritydemo.controller.MenuController;
 import com.tzashinorpu.springsecuritydemo.controller.OrgController;
-import com.tzashinorpu.springsecuritydemo.pojo.dto.MenuDTO;
 import com.tzashinorpu.springsecuritydemo.pojo.dto.OrgDTO;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,13 +20,13 @@ public class OrgDTODataListener implements ReadListener<OrgDTO> {
 	 */
 	private static final int BATCH_COUNT = 100;
 	/**
+	 * 假设这个是一个DAO，当然有业务逻辑这个也可以是一个service。当然如果不用存储这个对象没用。
+	 */
+	private final OrgController orgController;
+	/**
 	 * 缓存的数据
 	 */
 	private List<OrgDTO> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-	/**
-	 * 假设这个是一个DAO，当然有业务逻辑这个也可以是一个service。当然如果不用存储这个对象没用。
-	 */
-	private OrgController orgController;
 
 	/*public DemoDataListener() {
 		// 这里是demo，所以随便new一个。实际使用如果到了spring,请使用下面的有参构造函数

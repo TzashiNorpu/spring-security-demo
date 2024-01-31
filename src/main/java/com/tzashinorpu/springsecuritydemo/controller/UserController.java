@@ -1,10 +1,8 @@
 package com.tzashinorpu.springsecuritydemo.controller;
 
+import com.tzashinorpu.springsecuritydemo.constant.Constants;
 import com.tzashinorpu.springsecuritydemo.pojo.dto.UserDTO;
-import com.tzashinorpu.springsecuritydemo.pojo.dto.UserRoleDTO;
 import com.tzashinorpu.springsecuritydemo.pojo.po.SysUserPO;
-import com.tzashinorpu.springsecuritydemo.pojo.po.SysUserRolePO;
-import com.tzashinorpu.springsecuritydemo.pojo.vo.UserRoleVO;
 import com.tzashinorpu.springsecuritydemo.pojo.vo.UserVO;
 import com.tzashinorpu.springsecuritydemo.service.SysUserRoleService;
 import com.tzashinorpu.springsecuritydemo.service.SysUserService;
@@ -15,6 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 @RestController
 public class UserController {
 	@Autowired
@@ -24,30 +26,44 @@ public class UserController {
 	@Autowired
 	SysUserRoleService sysUserRoleService;
 
-	@PostMapping("/user")
+	@PostMapping(Constants.USER_REGISTER_PATH)
 	public UserVO addUser(@RequestBody UserDTO userDTO) {
 		SysUserPO sysUserPO = new SysUserPO();
+		sysUserPO.setUserCode(userDTO.getUserCode());
 		sysUserPO.setUsername(userDTO.getUsername());
 		sysUserPO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 		sysUserPO.setDeptCode(userDTO.getDeptCode());
 		sysUserPO.setOrgCode(userDTO.getOrgCode());
+		sysUserPO.setEmail(userDTO.getEmail());
+		sysUserPO.setPhone(userDTO.getPhone());
 		return sysUserService.addUser(sysUserPO);
 	}
 
+	@PostMapping(Constants.USERS_REGISTER_PATH)
+	public List<UserVO> batchAdd(@RequestBody List<UserDTO> dtos) {
+		ArrayList<SysUserPO> pos = new ArrayList<>();
+		dtos.forEach(item -> {
+			SysUserPO po = new SysUserPO();
+			po.setUserCode(item.getUserCode());
+			po.setUsername(item.getUsername());
+			po.setPassword(passwordEncoder.encode(item.getPassword()));
+			po.setDeptCode(item.getDeptCode());
+			po.setEmail(item.getEmail());
+			po.setPhone(item.getPhone());
+			po.setOrgCode(item.getOrgCode());
+			pos.add(po);
+		});
+		return sysUserService.batchAdd(pos);
+	}
+
 	@DeleteMapping("/user")
-	public UserVO del(@RequestBody UserDTO userDTO) throws Exception {
+	public UserVO del(@RequestBody UserDTO userDTO) {
 		SysUserPO sysUserPO = new SysUserPO();
 		sysUserPO.setUsername(userDTO.getUsername());
 		return sysUserService.delUser(sysUserPO);
 	}
 
-	@PostMapping("/user/role")
-	public UserRoleVO addRoleOfUser(@RequestBody UserRoleDTO userRoleDTO) {
-		SysUserRolePO sysUserRolePO = new SysUserRolePO();
-		sysUserRolePO.setUserId(userRoleDTO.getUserId());
-		sysUserRolePO.setRoleId(userRoleDTO.getRoleId());
-		return sysUserRoleService.addUserRole(sysUserRolePO);
-	}
+
 
 
 	/*@PutMapping("/user")

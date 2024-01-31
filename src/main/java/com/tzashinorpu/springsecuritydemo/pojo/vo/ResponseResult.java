@@ -1,13 +1,13 @@
 package com.tzashinorpu.springsecuritydemo.pojo.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.tzashinorpu.springsecuritydemo.enums.ResponseEnums;
+import com.tzashinorpu.springsecuritydemo.constant.enums.ResponseEnums;
 import lombok.Data;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class ResponseResult {
-	private Long code;
+	private Integer code;
 	private String msg;
 	private Object data;
 
@@ -15,7 +15,7 @@ public class ResponseResult {
 	private ResponseResult() {
 	}
 
-	private ResponseResult(Long code, String msg, Object data) {
+	private ResponseResult(Integer code, String msg, Object data) {
 		this.code = code;
 		this.msg = msg;
 		this.data = data;
@@ -32,8 +32,9 @@ public class ResponseResult {
 	public static ResponseResult error(String msg) {
 		return new ResponseResult(ResponseEnums.FAILURE.getCode(), msg, null);
 	}
-	public static ResponseResult error(String code,String msg) {
-		Long err_code = Long.valueOf(code);
+
+	public static ResponseResult error(String code, String msg) {
+		Integer err_code = Integer.valueOf(code);
 		return new ResponseResult(err_code, msg, null);
 	}
 
@@ -42,7 +43,7 @@ public class ResponseResult {
 		return new ResponseResult(ResponseEnums.ERROR.getCode(), ResponseEnums.ERROR.getMsg(), null);
 	}
 
-	public static ResponseResult error(Long code, String msg, Object data) {
+	public static ResponseResult error(Integer code, String msg, Object data) {
 		return new ResponseResult(code, msg, data);
 	}
 }

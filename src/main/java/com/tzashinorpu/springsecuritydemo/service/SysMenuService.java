@@ -1,7 +1,6 @@
 package com.tzashinorpu.springsecuritydemo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.tzashinorpu.springsecuritydemo.exception.MenuException;
 import com.tzashinorpu.springsecuritydemo.pojo.po.SysMenuPO;
 import com.tzashinorpu.springsecuritydemo.pojo.vo.MenuVO;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * @since 2024-01-18
  */
 public interface SysMenuService extends IService<SysMenuPO> {
-	MenuVO addMenu(SysMenuPO po) throws MenuException;
+	MenuVO addMenu(SysMenuPO po);
 
 	List<MenuVO> batchAdd(List<SysMenuPO> list);
 }

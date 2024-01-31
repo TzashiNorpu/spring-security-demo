@@ -1,57 +1,37 @@
 package com.tzashinorpu.springsecuritydemo;
 
-import com.tzashinorpu.springsecuritydemo.pojo.po.SysUserPO;
-import com.tzashinorpu.springsecuritydemo.mapper.SysUserMapper;
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.SmUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.SM2;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
 
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
 
-@SpringBootTest
+//@SpringBootTest
 class SpringSecurityDemoApplicationTests {
 
-	/*@Autowired
-	UserDao userDao;
-	@Test
-	void contextLoads() {
-		User u1 = new User();
-		u1.setUsername("admin");
-		u1.setPassword("123");
-		u1.setAccountNonExpired(true);
-		u1.setAccountNonLocked(true);
-		u1.setCredentialsNonExpired(true);
-		u1.setEnabled(true);
-		List<Role> rs1 = new ArrayList<>();
-		Role r1 = new Role();
-		r1.setName("ROLE_admin");
-		r1.setNameZh("管理员");
-		rs1.add(r1);
-		u1.setRoles(rs1);
-		User u2 = new User();
-		u2.setUsername("norpu");
-		u2.setPassword("123");
-		u2.setAccountNonExpired(true);
-		u2.setAccountNonLocked(true);
-		u2.setCredentialsNonExpired(true);
-		u2.setEnabled(true);
-		List<Role> rs2 = new ArrayList<>();
-		Role r2 = new Role();
-		r2.setName("ROLE_user");
-		r2.setNameZh("普通用户");
-		rs2.add(r2);
-		u2.setRoles(rs2);
-	}*/
-	@Autowired
-	SysUserMapper sysUserMapper;
 
 	@Test
 	void testSelect() {
-		System.out.println(("----- selectAll method test ------"));
-		List<SysUserPO> userList = sysUserMapper.selectList(null);
-		Assert.isTrue(2 == userList.size(), "");
-		userList.forEach(System.out::println);
+		KeyPair pair = SecureUtil.generateKeyPair("SM2");
+		byte[] privateKey = pair.getPrivate().getEncoded();
+		System.out.println("私钥为：" + HexUtil.encodeHexStr(privateKey));
 
+		byte[] publicKey = pair.getPublic().getEncoded();
+		System.out.println("公钥为：" + HexUtil.encodeHexStr(publicKey));
+
+		// 公钥加密，私钥解密
+		SM2 sm2 = SmUtil.sm2(privateKey, publicKey);
+		String text = "美丽新世纪";
+//		String encryptStr = sm2.encryptBcd(text, KeyType.PublicKey);
+//		String decryptStr = StrUtil.utf8Str(sm2.decryptFromBcd(encryptStr, KeyType.PrivateKey));
+//		String encryptStr = HexUtil.encodeHexStr(sm2.encrypt(text.getBytes(), KeyType.PublicKey));
+		String encryptStr = sm2.encryptHex(text, StandardCharsets.UTF_8, KeyType.PublicKey);
+		String decryptStr = sm2.decryptStr(encryptStr, KeyType.PrivateKey, StandardCharsets.UTF_8);
+		System.out.println(encryptStr);
+		System.out.println(decryptStr);
 	}
 }

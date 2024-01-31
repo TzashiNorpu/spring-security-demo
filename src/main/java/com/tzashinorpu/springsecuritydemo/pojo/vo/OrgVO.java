@@ -14,7 +14,7 @@ public class OrgVO extends BaseVO<OrgVO> {
 	private String orgCode;
 	private String orgName;
 
-	public OrgVO(Long orgCode, String orgName) {
+	public OrgVO(String orgCode, String orgName) {
 		super(new OrgVO(orgCode, orgName));
 	}
 }

@@ -25,13 +25,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		if (!request.getMethod().equals(HttpMethod.POST.name())) {
-			throw new AuthenticationServiceException(
-					"Authentication method not supported: " + request.getMethod());
-		}
-
+		if (!request.getMethod().equals(HttpMethod.POST.name())) throw new AuthenticationServiceException(
+				"Authentication method not supported: " + request.getMethod());
 //		String verify_code = (String) request.getSession().getAttribute("verify_code");
 		String contentType = request.getContentType();
+		//			checkCode(response, request.getParameter("code"), verify_code);
 		if (contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE) || contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_UTF8_VALUE)) {
 			Map<String, String> loginData = new HashMap<>();
 			try {
@@ -45,30 +43,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			String username = loginData.get(usernameParameter);
 			String passwordParameter = getPasswordParameter();
 			String password = loginData.get(passwordParameter);
-			if (username == null) {
-				username = "";
-			}
-			if (password == null) {
-				password = "";
-			}
+			if (username == null) username = "";
+			if (password == null) password = "";
 			username = username.trim();
-			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-					username, password);
+			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
 			setDetails(request, authRequest);
 			SysUserPO user = new SysUserPO();
 //			user.setUsername(username);
 //			sessionRegistry.registerNewSession(request.getSession(true).getId(), user);
 			return this.getAuthenticationManager().authenticate(authRequest);
-		} else {
-//			checkCode(response, request.getParameter("code"), verify_code);
-			return super.attemptAuthentication(request, response);
-		}
+		} else return super.attemptAuthentication(request, response);
 	}
 
 	public void checkCode(HttpServletResponse resp, String code, String verify_code) {
-		if (code == null || verify_code == null || code.isEmpty() || !verify_code.equalsIgnoreCase(code)) {
-			//验证码不正确
+		//验证码不正确
+		if (code == null || verify_code == null || code.isEmpty() || !verify_code.equalsIgnoreCase(code))
 			throw new AuthenticationServiceException("验证码不正确");
-		}
 	}
 }

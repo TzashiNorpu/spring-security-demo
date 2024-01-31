@@ -14,7 +14,7 @@ public class MenuVO extends BaseVO<MenuVO> {
 	private Integer menuCode;
 	private String menuName;
 
-	public MenuVO(Long menuId, String menuName) {
-		super(new MenuVO(menuId, menuName));
+	public MenuVO(Integer menuCode, String menuName) {
+		super(new MenuVO(menuCode, menuName));
 	}
 }

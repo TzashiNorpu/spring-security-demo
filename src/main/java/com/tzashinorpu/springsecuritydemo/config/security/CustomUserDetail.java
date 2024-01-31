@@ -32,7 +32,7 @@ public class CustomUserDetail implements UserDetails {
     private void setAuthorities(){
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         for (SysRolePO role : getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
         }
         this.authorities = authorities;
     }

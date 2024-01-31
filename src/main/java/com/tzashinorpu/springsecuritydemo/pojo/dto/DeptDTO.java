@@ -8,4 +8,5 @@ public class DeptDTO {
 	private String deptName;
 	private String orgCode;
 	private String ancestors;
+	private Short orderNum;
 }

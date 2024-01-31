@@ -32,6 +32,7 @@ public class DeptController {
 		po.setDeptName(deptDTO.getDeptName());
 		po.setOrgCode(deptDTO.getOrgCode());
 		po.setAncestors(deptDTO.getAncestors());
+		po.setOrderNum(deptDTO.getOrderNum());
 		return sysDeptService.addDept(po);
 	}
 
@@ -44,6 +45,7 @@ public class DeptController {
 			po.setDeptName(item.getDeptName());
 			po.setOrgCode(item.getOrgCode());
 			po.setAncestors(item.getAncestors());
+			po.setOrderNum(item.getOrderNum());
 			pos.add(po);
 		});
 		return sysDeptService.batchAdd(pos);

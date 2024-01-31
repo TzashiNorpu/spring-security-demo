@@ -1,8 +1,8 @@
 package com.tzashinorpu.springsecuritydemo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tzashinorpu.springsecuritydemo.exception.MenuException;
-import com.tzashinorpu.springsecuritydemo.exception.enums.BaseExceptionEnums;
+import com.tzashinorpu.springsecuritydemo.constant.enums.MenuEnums;
+import com.tzashinorpu.springsecuritydemo.exception.CustomException;
 import com.tzashinorpu.springsecuritydemo.mapper.SysMenuMapper;
 import com.tzashinorpu.springsecuritydemo.pojo.po.SysMenuPO;
 import com.tzashinorpu.springsecuritydemo.pojo.vo.MenuVO;
@@ -25,17 +25,17 @@ import java.util.List;
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuPO> implements SysMenuService {
 
 	@Override
-	public MenuVO addMenu(SysMenuPO po) throws MenuException {
+	public MenuVO addMenu(SysMenuPO po) {
 		MenuVO vo = new MenuVO();
 		vo.setMenuCode(po.getMenuCode());
 		vo.setMenuName(po.getMenuName());
 		boolean exists = lambdaQuery().eq(SysMenuPO::getMenuCode, po.getMenuCode()).exists();
-		Assert.shouldNotTrue(exists, BaseExceptionEnums.DATA_EXIST,vo);
+		Assert.shouldNotTrue(exists, MenuEnums.MENU_EXIST,vo);
 		try {
 			boolean save = this.save(po);
-			Assert.shouldTrue(save,BaseExceptionEnums.DATA_INSERT_FAILURE,vo);
+			Assert.shouldTrue(save, MenuEnums.MENU_INSERT_FAILURE,vo);
 		} catch (Exception e) {
-			throw new MenuException(e.getMessage(), vo);
+			throw new CustomException(e.getMessage(), vo);
 		}
 		return vo;
 	}
@@ -51,9 +51,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuPO> im
 		});
 		try {
 			boolean b = this.saveBatch(list);
-			Assert.shouldTrue(b, BaseExceptionEnums.DATA_INSERT_FAILURE, menuVOS);
+			Assert.shouldTrue(b, MenuEnums.MENU_INSERT_FAILURE, menuVOS);
 		} catch (Exception e) {
-			throw new MenuException(e.getMessage(), menuVOS);
+			throw new CustomException(e.getMessage(), menuVOS);
 		}
 		return menuVOS;
 	}
